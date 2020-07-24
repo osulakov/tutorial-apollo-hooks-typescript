@@ -1,16 +1,23 @@
 import React from 'react';
-import { useMutation, gql } from '@apollo/client';
-import { CREATE_ACCOUNT } from '../apollo/queries';
+import { useMutation, useQuery} from '@apollo/client';
+import { 
+    CREATE_ACCOUNT,
+    SEARCH_ACCOUNTS,
+    GET_ACCOUNTS 
+} from '../apollo/queries';
 import { 
     Accounts,
     Mutation_Root,
     Accounts_Mutation_Response
 } from '../apollo/schema';
 
+import { getRandomName } from '../libraries/GetRandomName';
+
+const name = getRandomName(3);
 
 const newAccount: Accounts = {
     channel: "DISPLAY",
-    name: "MY REAL HOTEL)))",
+    name: name,
     payment_terms: "CREDIT_CARD",
     region: "NA",
     status: "ACTIVE",
@@ -28,20 +35,52 @@ const Account = () => {
     >(CREATE_ACCOUNT, {
         variables: newAccount
     })
+
     //const [saveAccount, {error, data}] = useMutation(CREATE_ACCOUNT)
     if(data) {
-        //console.log(data.insert_accounts.returning[0].id)
+        
         console.log(data)
     }
     
     return (
         <div>
             <button onClick={() => saveAccount()}>Add Account</button>
+            <TestSearch />
+            <GetAccounts />
         </div>
     )
 }
 
 export default Account;
+
+const searchStr = "Blue"
+
+
+const TestSearch = () => {
+    const { loading, error, data } = useQuery(SEARCH_ACCOUNTS, {variables: {searchString: `%${searchStr}%`}})
+ 
+    if (loading) return <>'Loading...'</>
+    if (error) return <>'Something Bad Happened'</>
+    console.log('Test Search Accounts Data', data)
+    return (
+        <div>
+            Test Search Accounts
+        </div>
+    )
+}
+
+const GetAccounts = () => {
+    const { loading, error, data } = useQuery(GET_ACCOUNTS)
+ 
+    if (loading) return <>'Loading...'</>
+    if (error) return <>'Something Bad Happened'</>
+    console.log('Get Accounts data', data)
+    return (
+        <div>
+            Get Accounts
+        </div>
+    )
+}
 
 
 
